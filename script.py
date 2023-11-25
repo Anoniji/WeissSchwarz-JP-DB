@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import requests
 import time
@@ -18,6 +19,10 @@ def download_image(url, code):
     image_file = os.path.join("./cards", f"{code}.jpg")
 
     # Télécharge l'image
+    if os.path.isfile(image_file):
+        print('file_exist:', image_file)
+        return True
+
     response = requests.get(url)
     with open(image_file, "wb") as f:
         f.write(response.content)
@@ -43,7 +48,12 @@ def main():
             # Ouvre le fichier JSON
             with open(os.path.join(dir_path, file), "r", encoding="utf-8") as f:
                 # Charge le contenu du fichier JSON
-                data = json.load(f)
+                try:
+                    data = json.load(f)
+                except Exception as e:
+                    print('load_error:', os.path.join(dir_path, file))
+                    print(e)
+                    sys.exit(0)
 
             # Parcours les éléments du dictionnaire
             for item in data:
